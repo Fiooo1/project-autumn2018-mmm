@@ -1,0 +1,44 @@
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  CommonHTML: { linebreaks: { automatic: true } },
+  "HTML-CSS": { linebreaks: { automatic: true } },
+         SVG: { linebreaks: { automatic: true } }
+});
+</script>
+
+<head>
+    <script type="text/javascript" async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+</head>
+    <div class="container">
+    <h1>Home</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type='submit' >submit</button>
+    </form>
+        <p>{{ tasklist }}</p>
+<script type="math/tex; mode=display">
+      {{text1}}
+</script>
+<p></p>
+<script type="math/tex; mode=display">
+      {{text2}}
+</script>
+<p></p>
+<script type="math/tex; mode=display">
+      {{text3}}
+</script>
+<p></p>
+<script type="math/tex; mode=display">
+      {{text4}}
+</script>
+<p></p>
+<script type="math/tex; mode=display">
+      {{text5}}
+</script>
+
+
+    </div>
+
