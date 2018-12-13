@@ -16,7 +16,7 @@ class Generator:
 		self.cond = 'works'
 
 
-Generators = {11: Generator(11, 'TestGen.py', 'Тестовый генератор'), 2 :Generator(2,'TestGen2.py', 'Тестовый генератор 2')}
+Generators = {11: Generator(11, 'T10.py', 'Задача №10'), 2 :Generator(2,'TestGen2.py', 'Тестовый генератор 2')}
 
          
 def Gens_Cond():
@@ -30,11 +30,11 @@ def Gens_Cond():
 
 class FacadeHandler(BaseHTTPRequestHandler):    
 	def do_GET(self):                                          
-		rootdir ="C:/Users/Public/Documents/Programming/Project"   
+		rootdir ="C:/Users/Sentinel/Desktop/webpage"   
 		try:   
-			if self.headers['request'] == 'get_tasklist': #запрос списка задач 
+			if self.headers['request'] == 'get_taskList': #запрос списка задач 
 				self.send_response(200)   
-				self.send_header('request','get_tasklist') 
+				self.send_header('request','get_taskList') 
 				self.end_headers()          
 				data = Gens_Cond()
 				G = json.dumps(data)
@@ -42,17 +42,25 @@ class FacadeHandler(BaseHTTPRequestHandler):
 			if self.headers['request'] == 'get_task':                                                                                                 
 				id = int(self.headers['taskID'])
 				if Generators.get(id) != None:
-					cmd=rootdir+'/' + Generators.get(id).IP
+					cmd=rootdir + '/' + Generators.get(id).IP
+					
 					if(Path(cmd).exists()):
+						print("fff")
 						try:
-							p = subprocess.Popen(cmd, shell = True, stdout=subprocess.PIPE)
+							p = subprocess.Popen("python " + cmd, shell = True)
 							p.wait()
+							_fin = open("_stdout", "rb")
+							_data = _fin.read()
+							
 							print(cmd)
 							self.send_response(200)
 							self.send_header('request','get_task')
 							self.send_header('task.ID', self.headers['task.ID'])
 							self.end_headers()
-							self.wfile.write(p.stdout.read())
+
+							print(str(_data))
+							self.wfile.write(_data)
+							print("ACCEPT!!!")
 						except:
 							self.send_error(405)
 							Generators.get(id).cond = False
@@ -63,11 +71,11 @@ class FacadeHandler(BaseHTTPRequestHandler):
 					print(id);
 					print(Generators.get(id))                    
 					self.send_error(406)              
-		except IOError:  
+		except IOError:
 			self.send_error(404)
-			       
+			
 def run(server_class=HTTPServer, handler_class=FacadeHandler):
-	server_address = ('127.0.0.1', 8000)
+	server_address = ('127.0.0.1', 25500)
 	httpd = server_class(server_address, handler_class)
 	try:
 		print('server is running')

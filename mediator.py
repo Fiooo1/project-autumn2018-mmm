@@ -14,8 +14,14 @@ class Hosts:
 def get_request(host, req, data=None, **addhead):
 	connection = HTTPConnection(host)
 	reqID = GenReqId.next()
-	head = {"request": req, "reqID": reqID}
+	if (data != None):
+		conLen = len(data)
+	else:
+		conLen = 0
+	head = {"request": req, "reqID": reqID, "Content-Length": conLen}
 	head.update(addhead)
+	print("REQ HEAD =", head)
+	print("REQ BODY =", data)
 	connection.request("GET", '/', headers=head, body=data)
 	response = connection.getresponse()
 	connection.close()
@@ -30,12 +36,15 @@ def get_task_Facade(task):
 	return rdata
 
 def get_Tex(taskFile):
-	rheaders, rdata = get_request(Hosts.Tex, "get_Tex", taskFile)
+	print("in get_Tex taskFile = ", str(taskFile))
+	rheaders, rdata = get_request(Hosts.Tex, "get_tex", data=taskFile)
 	return rdata
 
 class MediatorHTTPRequestHandler(BaseHTTPRequestHandler):
 	def do_GET(self):
 		request, reqID = self.headers["request"], self.headers["reqID"]
+		print("Request from", self.client_address)
+		print("Request =", request, reqID)
 		#TODO check Fasade & Tex is runing
 		if request == "get_taskList":
 			taskList = get_taskList()
@@ -46,16 +55,19 @@ class MediatorHTTPRequestHandler(BaseHTTPRequestHandler):
 			self.wfile.write(taskList)
 		if request == "get_task":
 			taskID = self.headers["taskID"]
+			print("taskID = ", taskID)
 			#TODO request from database
 			taskFile = get_task_Facade(taskID)
+			print("taskFile = ", taskFile)
 			texFile = get_Tex(taskFile)
 			self.send_response(200)
 			self.send_header("response", "get_task")
 			self.send_header("resID", reqID)
 			self.send_header("Content-Type", "text/tex;charset=utf-8")
 			self.end_headers()
-			self.wfile.write(taskFile)
+			self.wfile.write(texFile)
 
-serv = HTTPServer(("127.0.0.1", 25800), MediatorHTTPRequestHandler)
-Hosts.set_hosts("127.0.0.1:25500", "127.0.0.1:25600", "127.0.0.1:25700", "127.0.0.1:25900")
+serv = HTTPServer(("127.0.0.1", 25700), MediatorHTTPRequestHandler)
+Hosts.set_hosts("127.0.0.1:25000", "127.0.0.1:25500", "127.0.0.1:25600", "127.0.0.1:25000")
+print("Mediator start")
 serv.serve_forever()
