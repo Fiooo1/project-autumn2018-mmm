@@ -1,10 +1,17 @@
 from common import AMQP_client
+import json
 
 class InterfaceClient(AMQP_client):
 	def parse(self, Id, Type, Data):
 		if Type == "post_taskList":
-			self.send("facade", "fanout", 2, "Thank you")
 			print("Task list:", Data)
+		if Type == "get_task":
+			
+			self.send("facade", 2, "get_task", {"task_id": Data, "args": ""})
+		if Type == "post_task":
+			with open("out.json", "w") as fout:
+				fout.write(str(json.loads(Data)))
+			print("See out.json")
 
 Client = InterfaceClient("localhost", "interface")
 Client.start_consume()
